@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # NSP QR Bot Configuration
 
-# Telegram Bot Token (получите у @BotFather)
-BOT_TOKEN = "7712440966:AAH3DnVoTl72XmOHryYbDzLx_1185H7U9BU"
+
+BOT_TOKEN = "NA"
 
 # База данных PostgreSQL
 DATABASE_URL = "postgresql://nsp_user:nsp_password@localhost/nsp_qr_db"
