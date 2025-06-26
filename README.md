@@ -61,8 +61,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements_api.txt
 
-### Проблемы (что вижу)
 
+**### Проблемы (что вижу)**
 В конфигурации (config.py):
 python# База данных PostgreSQL
 DATABASE_URL = "postgresql://nsp_user:nsp_password@localhost/nsp_qr_db"
