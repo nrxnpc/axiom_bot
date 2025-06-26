@@ -26,7 +26,7 @@ NSP QR Bot обеспечивает серверную часть програм
 - Поддержка офлайн режима с последующей синхронизацией
 
 ## Архитектура
-Telegram Bot (создание QR) ←→ SQLite Database ←→ REST API ←→ iOS App
+Telegram Bot (создание QR) ←→ SQLite / PostgreSQL Database ←→ REST API ←→ iOS App
 ## Компоненты
 
 **qr_bot.py** - Telegram бот
@@ -60,6 +60,17 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 pip install -r requirements_api.txt
+
+### Проблемы (что вижу)
+
+В конфигурации (config.py):
+python# База данных PostgreSQL
+DATABASE_URL = "postgresql://nsp_user:nsp_password@localhost/nsp_qr_db"
+В requirements указан PostgreSQL драйвер:
+asyncpg==0.29.0
+Но в коде фактически используется SQLite:
+api_server.py
+Код реально работает с SQLite, поэтому нужно исправить конфигурацию 
 
 
 
