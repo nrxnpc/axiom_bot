@@ -36,7 +36,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Конфигурация
-BOT_TOKEN = "7712440966:AAH3DnVoTl72XmOHryYbDzLx_1185H7U9BU"
+BOT_TOKEN = "NA:NA"
 ADMIN_IDS = [97915547]  # ID администраторов
 LOCK_FILE = "/tmp/nsp_bot.lock"
 
