@@ -5,7 +5,7 @@
 BOT_TOKEN = "NA"
 
 # База данных PostgreSQL
-DATABASE_URL = "postgresql://nsp_user:nsp_password@localhost/nsp_qr_db"
+DATABASE_URL = "postgresql+asyncpg://nsp_user:nsp_password@localhost/nsp_qr_db"
 
 # Авторизованные пользователи (Telegram ID)
 # Получить ID можно у @userinfobot

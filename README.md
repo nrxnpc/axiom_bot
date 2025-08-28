@@ -62,15 +62,56 @@ pip install -r requirements.txt
 pip install -r requirements_api.txt
 
 
-**### Проблемы (что вижу)**
-В конфигурации (config.py):
-python# База данных PostgreSQL
-DATABASE_URL = "postgresql://nsp_user:nsp_password@localhost/nsp_qr_db"
-В requirements указан PostgreSQL драйвер:
-asyncpg==0.29.0
-Но в коде фактически используется SQLite:
-api_server.py
-Код реально работает с SQLite, поэтому нужно исправить конфигурацию 
+## Переход на PostgreSQL ✅
+
+Проект успешно переведен на PostgreSQL с использованием SQLAlchemy ORM.
+
+### Новые файлы:
+- `models.py` - ORM модели для PostgreSQL
+- `qr_bot_postgres.py` - обновленная версия бота
+- `api_server.py` - полностью переписанный API сервер
+- `migrate_to_postgres.py` - скрипт миграции данных
+- `MIGRATION_GUIDE.md` - подробное руководство
+
+### Быстрый старт:
+
+1. **Установка PostgreSQL:**
+```bash
+# Ubuntu/Debian
+sudo apt install postgresql postgresql-contrib
+
+# Создание базы
+sudo -u postgres createdb nsp_qr_db
+sudo -u postgres createuser nsp_user
+sudo -u postgres psql -c "ALTER USER nsp_user WITH PASSWORD 'nsp_password';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE nsp_qr_db TO nsp_user;"
+```
+
+2. **Установка зависимостей:**
+```bash
+pip install -r requirements.txt
+pip install -r requirements_api.txt
+```
+
+3. **Миграция данных (если есть SQLite):**
+```bash
+python migrate_to_postgres.py
+```
+
+4. **Запуск:**
+```bash
+# Бот
+bash start_postgres_bot.sh
+
+# API сервер
+bash start_postgres_api.sh
+```
+
+### Преимущества PostgreSQL:
+- Масштабируемость и производительность
+- ACID транзакции и надежность
+- Поддержка JSON, UUID, массивов
+- Встроенная репликация и бэкапы 
 
 
 

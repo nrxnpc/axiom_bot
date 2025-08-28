@@ -8,7 +8,6 @@ API сервер для интеграции мобильного приложе
 import asyncio
 import logging
 import json
-import sqlite3
 import hashlib
 import secrets
 import uuid
@@ -20,20 +19,20 @@ from pathlib import Path
 from aiohttp import web, web_request, MultipartReader
 from aiohttp.web_response import Response
 from aiohttp_cors import setup as cors_setup, ResourceOptions
-import aiohttp_cors
+
+from sqlalchemy import select, func, update, delete
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import selectinload
+
+from config import DATABASE_URL, API_KEYS, API_HOST, API_PORT
+from models import (
+    Base, AppUser, QRCode, Product, NewsArticle, Car, Lottery, Order, 
+    PointTransaction, AppQRScan, SupportTicket, SupportMessage, UserSession
+)
 
 # Конфигурация
-DATABASE_PATH = "nsp_qr_bot.db"  # Используем базу данных бота
-API_HOST = "0.0.0.0"
-API_PORT = 8080
 UPLOADS_DIR = "uploads"
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-
-# API ключи для авторизации
-API_KEYS = {
-    "nsp_mobile_app": "nsp_mobile_app_api_key_2024",
-    "nsp_admin": "nsp_admin_api_key_2024"
-}
 
 # Создаем директорию для загрузок
 Path(UPLOADS_DIR).mkdir(exist_ok=True)
@@ -49,27 +48,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def get_db_connection():
-    """Получение подключения к базе данных"""
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+# Создание движка и сессии
+engine = create_async_engine(DATABASE_URL, echo=True)
+AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-def init_database():
-    """Инициализация базы данных с новыми таблицами"""
-    with open('database_schema.sql', 'r', encoding='utf-8') as f:
-        schema = f.read()
-    
-    conn = get_db_connection()
-    try:
-        conn.executescript(schema)
-        conn.commit()
+async def init_database():
+    """Инициализация базы данных"""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
         logger.info("База данных инициализирована")
-    except Exception as e:
-        logger.error(f"Ошибка инициализации БД: {e}")
-        raise
-    finally:
-        conn.close()
 
 def check_api_key(func):
     """Декоратор для проверки API ключа"""
@@ -105,20 +92,20 @@ def require_auth(func):
         return await func(request)
     return wrapper
 
-async def get_user_by_token(token: str) -> Optional[Dict]:
+async def get_user_by_token(token: str) -> Optional[AppUser]:
     """Получение пользователя по токену"""
-    conn = get_db_connection()
-    try:
-        cursor = conn.execute('''
-            SELECT u.*, s.expires_at 
-            FROM app_users u
-            JOIN user_sessions s ON u.user_id = s.user_id
-            WHERE s.token = ? AND s.is_active = 1 AND s.expires_at > datetime('now')
-        ''', (token,))
-        row = cursor.fetchone()
-        return dict(row) if row else None
-    finally:
-        conn.close()
+    async with AsyncSessionLocal() as db:
+        stmt = (
+            select(AppUser)
+            .join(UserSession)
+            .where(
+                UserSession.token == token,
+                UserSession.is_active == True,
+                UserSession.expires_at > func.now()
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
 
 def hash_password(password: str) -> str:
     """Хеширование пароля"""
@@ -137,9 +124,8 @@ def json_response(data: dict, status: int = 200) -> Response:
 async def health_check(request: web_request.Request) -> Response:
     """Проверка состояния API"""
     try:
-        conn = get_db_connection()
-        conn.execute("SELECT 1").fetchone()
-        conn.close()
+        async with AsyncSessionLocal() as db:
+            await db.execute(select(1))
         
         return json_response({
             "status": "healthy",
@@ -168,68 +154,70 @@ async def register_user(request: web_request.Request) -> Response:
                 "error": "Missing required fields"
             }, status=400)
         
-        # Проверка существования пользователя
-        conn = get_db_connection()
-        existing_user = conn.execute(
-            "SELECT user_id FROM app_users WHERE email = ?",
-            (data['email'],)
-        ).fetchone()
-        
-        if existing_user:
-            conn.close()
+        async with AsyncSessionLocal() as db:
+            # Проверка существования пользователя
+            existing_user = await db.execute(
+                select(AppUser).where(AppUser.email == data['email'])
+            )
+            if existing_user.scalar_one_or_none():
+                return json_response({
+                    "error": "User with this email already exists"
+                }, status=400)
+            
+            # Создание нового пользователя
+            user_id = str(uuid.uuid4())
+            password_hash = hash_password(data['password'])
+            
+            new_user = AppUser(
+                user_id=user_id,
+                name=data['name'],
+                email=data['email'],
+                phone=data['phone'],
+                password_hash=password_hash,
+                user_type=data['userType'],
+                points=100
+            )
+            db.add(new_user)
+            await db.flush()
+            
+            # Создание сессии
+            token = generate_token()
+            expires_at = datetime.now() + timedelta(days=30)
+            
+            session = UserSession(
+                user_id=new_user.id,
+                token=token,
+                expires_at=expires_at,
+                device_info=data.get('deviceInfo', '')
+            )
+            db.add(session)
+            
+            # Запись транзакции начисления
+            transaction = PointTransaction(
+                user_id=new_user.id,
+                type='bonus',
+                amount=100,
+                description='Бонус за регистрацию'
+            )
+            db.add(transaction)
+            
+            await db.commit()
+            
             return json_response({
-                "error": "User with this email already exists"
-            }, status=400)
-        
-        # Создание нового пользователя
-        user_id = str(uuid.uuid4())
-        password_hash = hash_password(data['password'])
-        
-        conn.execute('''
-            INSERT INTO app_users (user_id, name, email, phone, password_hash, user_type)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (user_id, data['name'], data['email'], data['phone'], password_hash, data['userType']))
-        
-        # Создание сессии
-        token = generate_token()
-        session_id = str(uuid.uuid4())
-        expires_at = datetime.now() + timedelta(days=30)
-        
-        conn.execute('''
-            INSERT INTO user_sessions (id, user_id, token, expires_at, device_info)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (session_id, user_id, token, expires_at, data.get('deviceInfo', '')))
-        
-        # Начальное начисление баллов
-        conn.execute('''
-            UPDATE app_users SET points = 100 WHERE user_id = ?
-        ''', (user_id,))
-        
-        # Запись транзакции начисления
-        transaction_id = str(uuid.uuid4())
-        conn.execute('''
-            INSERT INTO point_transactions (id, user_id, type, amount, description)
-            VALUES (?, ?, 'bonus', 100, 'Бонус за регистрацию')
-        ''', (transaction_id, user_id))
-        
-        conn.commit()
-        conn.close()
-        
-        return json_response({
-            "success": True,
-            "user": {
-                "id": user_id,
-                "name": data['name'],
-                "email": data['email'],
-                "phone": data['phone'],
-                "userType": data['userType'],
-                "points": 100,
-                "role": "user",
-                "registrationDate": datetime.now().isoformat(),
-                "isActive": True
-            },
-            "token": token
-        })
+                "success": True,
+                "user": {
+                    "id": user_id,
+                    "name": data['name'],
+                    "email": data['email'],
+                    "phone": data['phone'],
+                    "userType": data['userType'],
+                    "points": 100,
+                    "role": "user",
+                    "registrationDate": datetime.now().isoformat(),
+                    "isActive": True
+                },
+                "token": token
+            })
         
     except Exception as e:
         logger.error(f"Registration error: {e}")
@@ -248,53 +236,55 @@ async def login_user(request: web_request.Request) -> Response:
                 "error": "Email and password required"
             }, status=400)
         
-        conn = get_db_connection()
-        password_hash = hash_password(data['password'])
-        
-        user = conn.execute('''
-            SELECT * FROM app_users 
-            WHERE email = ? AND password_hash = ? AND is_active = 1
-        ''', (data['email'], password_hash)).fetchone()
-        
-        if not user:
-            conn.close()
+        async with AsyncSessionLocal() as db:
+            password_hash = hash_password(data['password'])
+            
+            user = await db.execute(
+                select(AppUser).where(
+                    AppUser.email == data['email'],
+                    AppUser.password_hash == password_hash,
+                    AppUser.is_active == True
+                )
+            )
+            user = user.scalar_one_or_none()
+            
+            if not user:
+                return json_response({
+                    "error": "Invalid credentials"
+                }, status=401)
+            
+            # Создание новой сессии
+            token = generate_token()
+            expires_at = datetime.now() + timedelta(days=30)
+            
+            session = UserSession(
+                user_id=user.id,
+                token=token,
+                expires_at=expires_at,
+                device_info=data.get('deviceInfo', '')
+            )
+            db.add(session)
+            
+            # Обновление времени последнего входа
+            user.last_login = func.now()
+            
+            await db.commit()
+            
             return json_response({
-                "error": "Invalid credentials"
-            }, status=401)
-        
-        # Создание новой сессии
-        token = generate_token()
-        session_id = str(uuid.uuid4())
-        expires_at = datetime.now() + timedelta(days=30)
-        
-        conn.execute('''
-            INSERT INTO user_sessions (id, user_id, token, expires_at, device_info)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (session_id, user['user_id'], token, expires_at, data.get('deviceInfo', '')))
-        
-        # Обновление времени последнего входа
-        conn.execute('''
-            UPDATE app_users SET last_login = datetime('now') WHERE user_id = ?
-        ''', (user['user_id'],))
-        
-        conn.commit()
-        conn.close()
-        
-        return json_response({
-            "success": True,
-            "user": {
-                "id": user['user_id'],
-                "name": user['name'],
-                "email": user['email'],
-                "phone": user['phone'],
-                "userType": user['user_type'],
-                "points": user['points'],
-                "role": user['role'],
-                "registrationDate": user['registration_date'],
-                "isActive": user['is_active']
-            },
-            "token": token
-        })
+                "success": True,
+                "user": {
+                    "id": user.user_id,
+                    "name": user.name,
+                    "email": user.email,
+                    "phone": user.phone,
+                    "userType": user.user_type,
+                    "points": user.points,
+                    "role": user.role,
+                    "registrationDate": user.registration_date.isoformat() if user.registration_date else None,
+                    "isActive": user.is_active
+                },
+                "token": token
+            })
         
     except Exception as e:
         logger.error(f"Login error: {e}")
@@ -311,7 +301,7 @@ async def scan_qr_code(request: web_request.Request) -> Response:
     try:
         data = await request.json()
         qr_code = data.get('qr_code')
-        user_id = request['user']['user_id']
+        user = request['user']
         location = data.get('location', 'Unknown')
         
         if not qr_code:
@@ -333,70 +323,70 @@ async def scan_qr_code(request: web_request.Request) -> Response:
         
         qr_id = parts[1]
         
-        conn = get_db_connection()
-        
-        # Поиск QR-кода в базе данных
-        qr_info = conn.execute('''
-            SELECT * FROM qr_codes WHERE qr_id = ?
-        ''', (qr_id,)).fetchone()
-        
-        if not qr_info:
-            conn.close()
+        async with AsyncSessionLocal() as db:
+            # Поиск QR-кода в базе данных
+            qr_info = await db.execute(
+                select(QRCode).where(QRCode.qr_id == qr_id)
+            )
+            qr_info = qr_info.scalar_one_or_none()
+            
+            if not qr_info:
+                return json_response({
+                    "error": "QR code not found",
+                    "valid": False
+                }, status=404)
+            
+            # Проверка на использование
+            if qr_info.is_used:
+                return json_response({
+                    "error": "QR code already used",
+                    "valid": False,
+                    "product_name": qr_info.product_name,
+                    "used_at": qr_info.used_at.isoformat() if qr_info.used_at else None
+                }, status=409)
+            
+            # Отметка QR-кода как использованного
+            qr_info.is_used = True
+            qr_info.used_by = user.id
+            qr_info.used_at = func.now()
+            qr_info.scanned_count += 1
+            qr_info.last_scanned = func.now()
+            
+            # Запись сканирования
+            scan = AppQRScan(
+                qr_id=qr_info.id,
+                user_id=user.id,
+                points_earned=qr_info.points,
+                product_name=qr_info.product_name,
+                product_category=qr_info.category,
+                location=location
+            )
+            db.add(scan)
+            await db.flush()
+            
+            # Запись транзакции баллов
+            transaction = PointTransaction(
+                user_id=user.id,
+                type='earned',
+                amount=qr_info.points,
+                description=f"Сканирование QR-кода ({qr_info.product_name})",
+                qr_scan_id=scan.id
+            )
+            db.add(transaction)
+            
+            await db.commit()
+            
+            logger.info(f"QR-код {qr_id} отсканирован пользователем {user.user_id}")
+            
             return json_response({
-                "error": "QR code not found",
-                "valid": False
-            }, status=404)
-        
-        # Проверка на использование
-        if qr_info['is_used']:
-            conn.close()
-            return json_response({
-                "error": "QR code already used",
-                "valid": False,
-                "product_name": qr_info['product_name'],
-                "used_at": qr_info['used_at']
-            }, status=409)
-        
-        # Отметка QR-кода как использованного
-        conn.execute('''
-            UPDATE qr_codes 
-            SET is_used = 1, used_by = ?, used_at = datetime('now'),
-                scanned_count = scanned_count + 1, last_scanned = datetime('now')
-            WHERE qr_id = ?
-        ''', (user_id, qr_id))
-        
-        # Запись сканирования
-        scan_id = str(uuid.uuid4())
-        conn.execute('''
-            INSERT INTO app_qr_scans 
-            (id, qr_id, user_id, points_earned, product_name, product_category, location)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (scan_id, qr_id, user_id, qr_info['points'],
-              qr_info['product_name'], qr_info['category'], location))
-        
-        # Запись транзакции баллов
-        transaction_id = str(uuid.uuid4())
-        conn.execute('''
-            INSERT INTO point_transactions 
-            (id, user_id, type, amount, description, qr_scan_id)
-            VALUES (?, ?, 'earned', ?, ?, ?)
-        ''', (transaction_id, user_id, qr_info['points'],
-              f"Сканирование QR-кода ({qr_info['product_name']})", scan_id))
-        
-        conn.commit()
-        conn.close()
-        
-        logger.info(f"QR-код {qr_id} отсканирован пользователем {user_id}")
-        
-        return json_response({
-            "valid": True,
-            "scan_id": scan_id,
-            "product_name": qr_info['product_name'],
-            "product_category": qr_info['category'],
-            "points_earned": qr_info['points'],
-            "description": qr_info['description'],
-            "timestamp": datetime.now().isoformat()
-        })
+                "valid": True,
+                "scan_id": str(scan.id),
+                "product_name": qr_info.product_name,
+                "product_category": qr_info.category,
+                "points_earned": qr_info.points,
+                "description": qr_info.description,
+                "timestamp": datetime.now().isoformat()
+            })
         
     except Exception as e:
         logger.error(f"QR scan error: {e}")
@@ -409,53 +399,53 @@ async def scan_qr_code(request: web_request.Request) -> Response:
 async def get_user_scans(request: web_request.Request) -> Response:
     """Получение истории сканирований пользователя"""
     try:
-        user_id = request['user']['user_id']
+        user = request['user']
         limit = int(request.query.get('limit', 50))
         offset = int(request.query.get('offset', 0))
         
-        conn = get_db_connection()
-        
-        scans = conn.execute('''
-            SELECT * FROM app_qr_scans 
-            WHERE user_id = ?
-            ORDER BY timestamp DESC
-            LIMIT ? OFFSET ?
-        ''', (user_id, limit, offset)).fetchall()
-        
-        total_scans = conn.execute('''
-            SELECT COUNT(*) as count FROM app_qr_scans WHERE user_id = ?
-        ''', (user_id,)).fetchone()['count']
-        
-        total_points = conn.execute('''
-            SELECT COALESCE(SUM(points_earned), 0) as total 
-            FROM app_qr_scans WHERE user_id = ?
-        ''', (user_id,)).fetchone()['total']
-        
-        conn.close()
-        
-        scans_list = []
-        for scan in scans:
-            scans_list.append({
-                "id": scan['id'],
-                "qr_code": scan['qr_id'],
-                "product_name": scan['product_name'],
-                "product_category": scan['product_category'],
-                "points_earned": scan['points_earned'],
-                "timestamp": scan['timestamp'],
-                "location": scan['location']
+        async with AsyncSessionLocal() as db:
+            scans = await db.execute(
+                select(AppQRScan)
+                .where(AppQRScan.user_id == user.id)
+                .order_by(AppQRScan.timestamp.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+            scans = scans.scalars().all()
+            
+            total_scans = await db.execute(
+                select(func.count(AppQRScan.id)).where(AppQRScan.user_id == user.id)
+            )
+            total_scans = total_scans.scalar() or 0
+            
+            total_points = await db.execute(
+                select(func.sum(AppQRScan.points_earned)).where(AppQRScan.user_id == user.id)
+            )
+            total_points = total_points.scalar() or 0
+            
+            scans_list = []
+            for scan in scans:
+                scans_list.append({
+                    "id": str(scan.id),
+                    "qr_code": str(scan.qr_id),
+                    "product_name": scan.product_name,
+                    "product_category": scan.product_category,
+                    "points_earned": scan.points_earned,
+                    "timestamp": scan.timestamp.isoformat() if scan.timestamp else None,
+                    "location": scan.location
+                })
+            
+            return json_response({
+                "user_id": user.user_id,
+                "total_scans": total_scans,
+                "total_points": total_points,
+                "scans": scans_list,
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset,
+                    "has_more": offset + len(scans_list) < total_scans
+                }
             })
-        
-        return json_response({
-            "user_id": user_id,
-            "total_scans": total_scans,
-            "total_points": total_points,
-            "scans": scans_list,
-            "pagination": {
-                "limit": limit,
-                "offset": offset,
-                "has_more": offset + len(scans_list) < total_scans
-            }
-        })
         
     except Exception as e:
         logger.error(f"Get user scans error: {e}")
@@ -472,46 +462,45 @@ async def get_cars(request: web_request.Request) -> Response:
         limit = int(request.query.get('limit', 50))
         offset = int(request.query.get('offset', 0))
         
-        conn = get_db_connection()
-        
-        cars = conn.execute('''
-            SELECT * FROM cars 
-            WHERE is_active = 1
-            ORDER BY created_at DESC
-            LIMIT ? OFFSET ?
-        ''', (limit, offset)).fetchall()
-        
-        conn.close()
-        
-        cars_list = []
-        for car in cars:
-            cars_list.append({
-                "id": car['id'],
-                "brand": car['brand'],
-                "model": car['model'],
-                "year": car['year'],
-                "price": car['price'],
-                "imageURL": car['image_url'] or "",
-                "description": car['description'] or "",
-                "specifications": {
-                    "engine": car['engine'] or "",
-                    "transmission": car['transmission'] or "",
-                    "fuelType": car['fuel_type'] or "",
-                    "bodyType": car['body_type'] or "",
-                    "drivetrain": car['drivetrain'] or "",
-                    "color": car['color'] or ""
-                },
-                "isActive": bool(car['is_active']),
-                "createdAt": car['created_at']
+        async with AsyncSessionLocal() as db:
+            cars = await db.execute(
+                select(Car)
+                .where(Car.is_active == True)
+                .order_by(Car.created_at.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+            cars = cars.scalars().all()
+            
+            cars_list = []
+            for car in cars:
+                cars_list.append({
+                    "id": str(car.id),
+                    "brand": car.brand,
+                    "model": car.model,
+                    "year": car.year,
+                    "price": car.price,
+                    "imageURL": car.image_url or "",
+                    "description": car.description or "",
+                    "specifications": {
+                        "engine": car.engine or "",
+                        "transmission": car.transmission or "",
+                        "fuelType": car.fuel_type or "",
+                        "bodyType": car.body_type or "",
+                        "drivetrain": car.drivetrain or "",
+                        "color": car.color or ""
+                    },
+                    "isActive": bool(car.is_active),
+                    "createdAt": car.created_at.isoformat() if car.created_at else None
+                })
+            
+            return json_response({
+                "cars": cars_list,
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset
+                }
             })
-        
-        return json_response({
-            "cars": cars_list,
-            "pagination": {
-                "limit": limit,
-                "offset": offset
-            }
-        })
         
     except Exception as e:
         logger.error(f"Get cars error: {e}")
@@ -525,7 +514,7 @@ async def add_car(request: web_request.Request) -> Response:
     """Добавление нового автомобиля (только для админов)"""
     try:
         user = request['user']
-        if user['role'] != 'admin':
+        if user.role != 'admin':
             return json_response({
                 "error": "Insufficient permissions"
             }, status=403)
@@ -538,30 +527,29 @@ async def add_car(request: web_request.Request) -> Response:
                 "error": "Missing required fields"
             }, status=400)
         
-        car_id = str(uuid.uuid4())
-        
-        conn = get_db_connection()
-        conn.execute('''
-            INSERT INTO cars (
-                id, brand, model, year, price, description, 
-                engine, transmission, fuel_type, body_type, 
-                drivetrain, color, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            car_id, data['brand'], data['model'], data['year'], data['price'],
-            data.get('description', ''), data.get('engine', ''),
-            data.get('transmission', ''), data.get('fuelType', ''),
-            data.get('bodyType', ''), data.get('drivetrain', ''),
-            data.get('color', ''), user['user_id']
-        ))
-        conn.commit()
-        conn.close()
-        
-        return json_response({
-            "success": True,
-            "car_id": car_id,
-            "message": "Car added successfully"
-        })
+        async with AsyncSessionLocal() as db:
+            new_car = Car(
+                brand=data['brand'],
+                model=data['model'],
+                year=data['year'],
+                price=data['price'],
+                description=data.get('description', ''),
+                engine=data.get('engine', ''),
+                transmission=data.get('transmission', ''),
+                fuel_type=data.get('fuelType', ''),
+                body_type=data.get('bodyType', ''),
+                drivetrain=data.get('drivetrain', ''),
+                color=data.get('color', ''),
+                created_by=user.id
+            )
+            db.add(new_car)
+            await db.commit()
+            
+            return json_response({
+                "success": True,
+                "car_id": str(new_car.id),
+                "message": "Car added successfully"
+            })
         
     except Exception as e:
         logger.error(f"Add car error: {e}")
@@ -578,41 +566,38 @@ async def get_products(request: web_request.Request) -> Response:
         limit = int(request.query.get('limit', 50))
         offset = int(request.query.get('offset', 0))
         
-        conn = get_db_connection()
-        
-        products = conn.execute('''
-            SELECT * FROM products 
-            WHERE is_active = 1
-            ORDER BY created_at DESC
-            LIMIT ? OFFSET ?
-        ''', (limit, offset)).fetchall()
-        
-        conn.close()
-        
-        products_list = []
-        for product in products:
-            delivery_options = json.loads(product['delivery_options']) if product['delivery_options'] else []
+        async with AsyncSessionLocal() as db:
+            products = await db.execute(
+                select(Product)
+                .where(Product.is_active == True)
+                .order_by(Product.created_at.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+            products = products.scalars().all()
             
-            products_list.append({
-                "id": product['id'],
-                "name": product['name'],
-                "category": product['category'],
-                "pointsCost": product['points_cost'],
-                "imageURL": product['image_url'] or "",
-                "description": product['description'] or "",
-                "stockQuantity": product['stock_quantity'],
-                "isActive": bool(product['is_active']),
-                "createdAt": product['created_at'],
-                "deliveryOptions": delivery_options
+            products_list = []
+            for product in products:
+                products_list.append({
+                    "id": str(product.id),
+                    "name": product.name,
+                    "category": product.category,
+                    "pointsCost": product.points_cost,
+                    "imageURL": product.image_url or "",
+                    "description": product.description or "",
+                    "stockQuantity": product.stock_quantity,
+                    "isActive": bool(product.is_active),
+                    "createdAt": product.created_at.isoformat() if product.created_at else None,
+                    "deliveryOptions": product.delivery_options or []
+                })
+            
+            return json_response({
+                "products": products_list,
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset
+                }
             })
-        
-        return json_response({
-            "products": products_list,
-            "pagination": {
-                "limit": limit,
-                "offset": offset
-            }
-        })
         
     except Exception as e:
         logger.error(f"Get products error: {e}")
@@ -629,41 +614,38 @@ async def get_news(request: web_request.Request) -> Response:
         limit = int(request.query.get('limit', 50))
         offset = int(request.query.get('offset', 0))
         
-        conn = get_db_connection()
-        
-        news = conn.execute('''
-            SELECT * FROM news_articles 
-            WHERE is_published = 1
-            ORDER BY published_at DESC
-            LIMIT ? OFFSET ?
-        ''', (limit, offset)).fetchall()
-        
-        conn.close()
-        
-        news_list = []
-        for article in news:
-            tags = json.loads(article['tags']) if article['tags'] else []
+        async with AsyncSessionLocal() as db:
+            news = await db.execute(
+                select(NewsArticle)
+                .where(NewsArticle.is_published == True)
+                .order_by(NewsArticle.published_at.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+            news = news.scalars().all()
             
-            news_list.append({
-                "id": article['id'],
-                "title": article['title'],
-                "content": article['content'],
-                "imageURL": article['image_url'] or "",
-                "isImportant": bool(article['is_important']),
-                "createdAt": article['created_at'],
-                "publishedAt": article['published_at'],
-                "isPublished": bool(article['is_published']),
-                "authorId": article['author_id'],
-                "tags": tags
+            news_list = []
+            for article in news:
+                news_list.append({
+                    "id": str(article.id),
+                    "title": article.title,
+                    "content": article.content,
+                    "imageURL": article.image_url or "",
+                    "isImportant": bool(article.is_important),
+                    "createdAt": article.created_at.isoformat() if article.created_at else None,
+                    "publishedAt": article.published_at.isoformat() if article.published_at else None,
+                    "isPublished": bool(article.is_published),
+                    "authorId": str(article.author_id) if article.author_id else None,
+                    "tags": article.tags or []
+                })
+            
+            return json_response({
+                "news": news_list,
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset
+                }
             })
-        
-        return json_response({
-            "news": news_list,
-            "pagination": {
-                "limit": limit,
-                "offset": offset
-            }
-        })
         
     except Exception as e:
         logger.error(f"Get news error: {e}")
@@ -678,40 +660,39 @@ async def get_news(request: web_request.Request) -> Response:
 async def get_user_transactions(request: web_request.Request) -> Response:
     """Получение истории транзакций пользователя"""
     try:
-        user_id = request['user']['user_id']
+        user = request['user']
         limit = int(request.query.get('limit', 50))
         offset = int(request.query.get('offset', 0))
         
-        conn = get_db_connection()
-        
-        transactions = conn.execute('''
-            SELECT * FROM point_transactions 
-            WHERE user_id = ?
-            ORDER BY timestamp DESC
-            LIMIT ? OFFSET ?
-        ''', (user_id, limit, offset)).fetchall()
-        
-        conn.close()
-        
-        transactions_list = []
-        for transaction in transactions:
-            transactions_list.append({
-                "id": transaction['id'],
-                "userId": transaction['user_id'],
-                "type": transaction['type'],
-                "amount": transaction['amount'],
-                "description": transaction['description'],
-                "timestamp": transaction['timestamp'],
-                "relatedId": transaction['related_id']
+        async with AsyncSessionLocal() as db:
+            transactions = await db.execute(
+                select(PointTransaction)
+                .where(PointTransaction.user_id == user.id)
+                .order_by(PointTransaction.timestamp.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+            transactions = transactions.scalars().all()
+            
+            transactions_list = []
+            for transaction in transactions:
+                transactions_list.append({
+                    "id": str(transaction.id),
+                    "userId": str(transaction.user_id),
+                    "type": transaction.type,
+                    "amount": transaction.amount,
+                    "description": transaction.description,
+                    "timestamp": transaction.timestamp.isoformat() if transaction.timestamp else None,
+                    "relatedId": str(transaction.related_id) if transaction.related_id else None
+                })
+            
+            return json_response({
+                "transactions": transactions_list,
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset
+                }
             })
-        
-        return json_response({
-            "transactions": transactions_list,
-            "pagination": {
-                "limit": limit,
-                "offset": offset
-            }
-        })
         
     except Exception as e:
         logger.error(f"Get user transactions error: {e}")
@@ -727,7 +708,7 @@ async def upload_file(request: web_request.Request) -> Response:
     """Загрузка файла"""
     try:
         user = request['user']
-        if user['role'] not in ['admin', 'operator']:
+        if user.role not in ['admin', 'operator']:
             return json_response({
                 "error": "Insufficient permissions"
             }, status=403)
@@ -783,55 +764,65 @@ async def upload_file(request: web_request.Request) -> Response:
 async def get_statistics(request: web_request.Request) -> Response:
     """Получение общей статистики"""
     try:
-        conn = get_db_connection()
-        
-        # Общая статистика QR-кодов
-        qr_stats = conn.execute('''
-            SELECT 
-                COUNT(*) as total_qr_codes,
-                COUNT(*) FILTER (WHERE is_used = 0) as unused_qr_codes,
-                COUNT(*) FILTER (WHERE is_used = 1) as used_qr_codes,
-                COALESCE(SUM(scanned_count), 0) as total_scans
-            FROM qr_codes
-        ''').fetchone()
-        
-        # Статистика пользователей
-        user_stats = conn.execute('''
-            SELECT 
-                COUNT(*) as total_users,
-                COUNT(*) FILTER (WHERE is_active = 1) as active_users
-            FROM app_users
-        ''').fetchone()
-        
-        # Статистика сканирований
-        scan_stats = conn.execute('''
-            SELECT 
-                COUNT(*) as total_app_scans,
-                COUNT(DISTINCT user_id) as unique_scanners,
-                COALESCE(SUM(points_earned), 0) as total_points_earned
-            FROM app_qr_scans
-        ''').fetchone()
-        
-        conn.close()
-        
-        return json_response({
-            "qr_codes": {
-                "total": qr_stats['total_qr_codes'],
-                "unused": qr_stats['unused_qr_codes'],
-                "used": qr_stats['used_qr_codes'],
-                "total_scans": qr_stats['total_scans']
-            },
-            "users": {
-                "total": user_stats['total_users'],
-                "active": user_stats['active_users']
-            },
-            "scans": {
-                "total": scan_stats['total_app_scans'],
-                "unique_scanners": scan_stats['unique_scanners'],
-                "total_points_earned": scan_stats['total_points_earned']
-            },
-            "timestamp": datetime.now().isoformat()
-        })
+        async with AsyncSessionLocal() as db:
+            # Общая статистика QR-кодов
+            total_qr_codes = await db.execute(select(func.count(QRCode.id)))
+            total_qr_codes = total_qr_codes.scalar() or 0
+            
+            unused_qr_codes = await db.execute(
+                select(func.count(QRCode.id)).where(QRCode.is_used == False)
+            )
+            unused_qr_codes = unused_qr_codes.scalar() or 0
+            
+            used_qr_codes = await db.execute(
+                select(func.count(QRCode.id)).where(QRCode.is_used == True)
+            )
+            used_qr_codes = used_qr_codes.scalar() or 0
+            
+            total_scans = await db.execute(select(func.sum(QRCode.scanned_count)))
+            total_scans = total_scans.scalar() or 0
+            
+            # Статистика пользователей
+            total_users = await db.execute(select(func.count(AppUser.id)))
+            total_users = total_users.scalar() or 0
+            
+            active_users = await db.execute(
+                select(func.count(AppUser.id)).where(AppUser.is_active == True)
+            )
+            active_users = active_users.scalar() or 0
+            
+            # Статистика сканирований
+            total_app_scans = await db.execute(select(func.count(AppQRScan.id)))
+            total_app_scans = total_app_scans.scalar() or 0
+            
+            unique_scanners = await db.execute(
+                select(func.count(func.distinct(AppQRScan.user_id)))
+            )
+            unique_scanners = unique_scanners.scalar() or 0
+            
+            total_points_earned = await db.execute(
+                select(func.sum(AppQRScan.points_earned))
+            )
+            total_points_earned = total_points_earned.scalar() or 0
+            
+            return json_response({
+                "qr_codes": {
+                    "total": total_qr_codes,
+                    "unused": unused_qr_codes,
+                    "used": used_qr_codes,
+                    "total_scans": total_scans
+                },
+                "users": {
+                    "total": total_users,
+                    "active": active_users
+                },
+                "scans": {
+                    "total": total_app_scans,
+                    "unique_scanners": unique_scanners,
+                    "total_points_earned": total_points_earned
+                },
+                "timestamp": datetime.now().isoformat()
+            })
         
     except Exception as e:
         logger.error(f"Get statistics error: {e}")
@@ -900,21 +891,33 @@ def init_app():
     
     return app
 
-def main():
+async def main():
     """Главная функция"""
     try:
         # Инициализация базы данных
-        init_database()
+        await init_database()
         
         # Создание приложения
         app = init_app()
         
         # Запуск сервера
         logger.info(f"Запуск API сервера на {API_HOST}:{API_PORT}")
-        web.run_app(app, host=API_HOST, port=API_PORT)
+        
+        runner = web.AppRunner(app)
+        await runner.setup()
+        
+        site = web.TCPSite(runner, API_HOST, API_PORT)
+        await site.start()
+        
+        try:
+            await asyncio.Future()  # Бесконечное ожидание
+        except KeyboardInterrupt:
+            logger.info("Остановка сервера...")
+        finally:
+            await runner.cleanup()
         
     except Exception as e:
         logger.error(f"Ошибка запуска API сервера: {e}")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
