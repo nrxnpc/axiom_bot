@@ -1,0 +1,213 @@
+2025-09-03 13:50:24,227 - __main__ - ERROR - Ошибка запуска API сервера: Multiple exceptions: [Errno 61] Connect call failed ('::1', 5432, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 5432)
+2025-09-03 13:55:27,505 - __main__ - ERROR - Ошибка запуска API сервера: Multiple exceptions: [Errno 61] Connect call failed ('::1', 5432, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 5432)
+2025-09-03 13:59:06,229 - __main__ - ERROR - Ошибка запуска API сервера: Multiple exceptions: [Errno 61] Connect call failed ('::1', 5432, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 5432)
+2025-09-03 14:04:12,077 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-09-03 14:04:12,078 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-09-03 14:04:12,080 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-09-03 14:04:12,080 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-09-03 14:04:12,081 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-09-03 14:04:12,081 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-09-03 14:04:12,081 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-09-03 14:04:12,083 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,083 - sqlalchemy.engine.Engine - INFO - [generated in 0.00011s] ('qr_codes', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,092 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,092 - sqlalchemy.engine.Engine - INFO - [cached since 0.009528s ago] ('app_users', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,093 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,093 - sqlalchemy.engine.Engine - INFO - [cached since 0.0102s ago] ('cars', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,093 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,093 - sqlalchemy.engine.Engine - INFO - [cached since 0.01079s ago] ('products', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,094 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,094 - sqlalchemy.engine.Engine - INFO - [cached since 0.01144s ago] ('news_articles', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,095 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,095 - sqlalchemy.engine.Engine - INFO - [cached since 0.0121s ago] ('lotteries', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,095 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,095 - sqlalchemy.engine.Engine - INFO - [cached since 0.01262s ago] ('orders', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,096 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,096 - sqlalchemy.engine.Engine - INFO - [cached since 0.01293s ago] ('price_requests', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,096 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,096 - sqlalchemy.engine.Engine - INFO - [cached since 0.01322s ago] ('point_transactions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,096 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,096 - sqlalchemy.engine.Engine - INFO - [cached since 0.0136s ago] ('app_qr_scans', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,097 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,097 - sqlalchemy.engine.Engine - INFO - [cached since 0.01392s ago] ('support_tickets', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,097 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,097 - sqlalchemy.engine.Engine - INFO - [cached since 0.01421s ago] ('support_messages', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,097 - sqlalchemy.engine.Engine - INFO - SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = $1::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[$2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != $7::VARCHAR
+2025-09-03 14:04:12,097 - sqlalchemy.engine.Engine - INFO - [cached since 0.01452s ago] ('user_sessions', 'r', 'p', 'f', 'v', 'm', 'pg_catalog')
+2025-09-03 14:04:12,098 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE cars (
+	id UUID NOT NULL, 
+	brand VARCHAR NOT NULL, 
+	model VARCHAR NOT NULL, 
+	year INTEGER NOT NULL, 
+	price VARCHAR NOT NULL, 
+	image_url VARCHAR, 
+	description TEXT, 
+	engine VARCHAR, 
+	transmission VARCHAR, 
+	fuel_type VARCHAR, 
+	body_type VARCHAR, 
+	drivetrain VARCHAR, 
+	color VARCHAR, 
+	is_active BOOLEAN, 
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	created_by UUID, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(created_by) REFERENCES app_users (id)
+)
+
+
+2025-09-03 14:04:12,098 - sqlalchemy.engine.Engine - INFO - [no key 0.00005s] ()
+2025-09-03 14:04:12,109 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE products (
+	id UUID NOT NULL, 
+	name VARCHAR NOT NULL, 
+	category VARCHAR NOT NULL, 
+	points_cost INTEGER NOT NULL, 
+	image_url VARCHAR, 
+	description TEXT, 
+	stock_quantity INTEGER, 
+	is_active BOOLEAN, 
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	delivery_options JSONB, 
+	created_by UUID, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(created_by) REFERENCES app_users (id)
+)
+
+
+2025-09-03 14:04:12,109 - sqlalchemy.engine.Engine - INFO - [no key 0.00005s] ()
+2025-09-03 14:04:12,114 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE news_articles (
+	id UUID NOT NULL, 
+	title VARCHAR NOT NULL, 
+	content TEXT NOT NULL, 
+	image_url VARCHAR, 
+	is_important BOOLEAN, 
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	published_at TIMESTAMP WITHOUT TIME ZONE, 
+	is_published BOOLEAN, 
+	author_id UUID, 
+	tags JSONB, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(author_id) REFERENCES app_users (id)
+)
+
+
+2025-09-03 14:04:12,114 - sqlalchemy.engine.Engine - INFO - [no key 0.00005s] ()
+2025-09-03 14:04:12,118 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE lotteries (
+	id UUID NOT NULL, 
+	title VARCHAR NOT NULL, 
+	description TEXT NOT NULL, 
+	prize VARCHAR NOT NULL, 
+	start_date TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	end_date TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	is_active BOOLEAN, 
+	participants JSONB, 
+	winner_id UUID, 
+	min_points_required INTEGER, 
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	image_url VARCHAR, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(winner_id) REFERENCES app_users (id)
+)
+
+
+2025-09-03 14:04:12,119 - sqlalchemy.engine.Engine - INFO - [no key 0.00005s] ()
+2025-09-03 14:04:12,123 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE support_tickets (
+	id UUID NOT NULL, 
+	user_id UUID NOT NULL, 
+	subject VARCHAR NOT NULL, 
+	status VARCHAR, 
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	priority VARCHAR, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(user_id) REFERENCES app_users (id)
+)
+
+
+2025-09-03 14:04:12,123 - sqlalchemy.engine.Engine - INFO - [no key 0.00005s] ()
+2025-09-03 14:04:12,127 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE orders (
+	id UUID NOT NULL, 
+	user_id UUID NOT NULL, 
+	product_id UUID NOT NULL, 
+	points_spent INTEGER NOT NULL, 
+	status VARCHAR, 
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	delivery_address TEXT, 
+	delivery_option VARCHAR NOT NULL, 
+	tracking_number VARCHAR, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(user_id) REFERENCES app_users (id), 
+	FOREIGN KEY(product_id) REFERENCES products (id)
+)
+
+
+2025-09-03 14:04:12,127 - sqlalchemy.engine.Engine - INFO - [no key 0.00006s] ()
+2025-09-03 14:04:12,132 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE price_requests (
+	id UUID NOT NULL, 
+	user_id UUID NOT NULL, 
+	car_id UUID NOT NULL, 
+	user_message TEXT, 
+	status VARCHAR, 
+	created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	dealer_response TEXT, 
+	estimated_price VARCHAR, 
+	responded_at TIMESTAMP WITHOUT TIME ZONE, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(user_id) REFERENCES app_users (id), 
+	FOREIGN KEY(car_id) REFERENCES cars (id)
+)
+
+
+2025-09-03 14:04:12,132 - sqlalchemy.engine.Engine - INFO - [no key 0.00005s] ()
+2025-09-03 14:04:12,137 - sqlalchemy.engine.Engine - INFO - 
+CREATE TABLE support_messages (
+	id UUID NOT NULL, 
+	ticket_id UUID NOT NULL, 
+	content TEXT NOT NULL, 
+	sender_id UUID NOT NULL, 
+	sender_role VARCHAR NOT NULL, 
+	timestamp TIMESTAMP WITHOUT TIME ZONE DEFAULT now(), 
+	attachments JSONB, 
+	PRIMARY KEY (id), 
+	FOREIGN KEY(ticket_id) REFERENCES support_tickets (id), 
+	FOREIGN KEY(sender_id) REFERENCES app_users (id)
+)
+
+
+2025-09-03 14:04:12,137 - sqlalchemy.engine.Engine - INFO - [no key 0.00005s] ()
+2025-09-03 14:04:12,143 - __main__ - INFO - База данных инициализирована
+2025-09-03 14:04:12,143 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-09-03 14:04:12,144 - __main__ - INFO - Запуск API сервера на 0.0.0.0:8080
