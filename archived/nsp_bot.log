@@ -1,0 +1,169 @@
+2025-06-11 14:51:32,440 - __main__ - INFO - Получена блокировка: /tmp/nsp_bot.lock
+2025-06-11 14:51:32,495 - __main__ - INFO - База данных инициализирована успешно
+2025-06-11 14:51:32,495 - __main__ - INFO - Бот инициализирован успешно
+2025-06-11 14:51:32,495 - __main__ - INFO - Запуск NSP QR Generator Bot...
+2025-06-11 14:51:34,347 - __main__ - ERROR - Ошибка запуска бота: Telegram server says - Unauthorized
+2025-06-11 14:51:34,598 - __main__ - ERROR - Критическая ошибка: Telegram server says - Unauthorized
+2025-06-11 14:51:34,598 - __main__ - INFO - Завершение работы бота
+2025-06-11 14:51:34,598 - __main__ - INFO - Блокировка освобождена
+2025-06-11 14:51:34,599 - __main__ - ERROR - Критическая ошибка: Telegram server says - Unauthorized
+2025-06-11 14:53:59,192 - __main__ - INFO - Получена блокировка: /tmp/nsp_bot.lock
+2025-06-11 14:53:59,239 - __main__ - INFO - База данных инициализирована успешно
+2025-06-11 14:53:59,240 - __main__ - INFO - Бот инициализирован успешно
+2025-06-11 14:53:59,240 - __main__ - INFO - Запуск NSP QR Generator Bot...
+2025-06-11 14:53:59,498 - aiogram.dispatcher - INFO - Start polling
+2025-06-11 14:53:59,581 - aiogram.dispatcher - INFO - Run polling for bot @NSPQRBOT id=7712440966 - 'Axiom'
+2025-06-11 14:54:03,773 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:03,773 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:54:09,335 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:09,336 - aiogram.dispatcher - WARNING - Sleep for 1.336388 seconds and try again... (tryings = 1, bot id = 7712440966)
+2025-06-11 14:54:15,568 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:15,568 - aiogram.dispatcher - WARNING - Sleep for 1.673821 seconds and try again... (tryings = 2, bot id = 7712440966)
+2025-06-11 14:54:22,803 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:22,804 - aiogram.dispatcher - WARNING - Sleep for 2.202119 seconds and try again... (tryings = 3, bot id = 7712440966)
+2025-06-11 14:54:28,219 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:28,219 - aiogram.dispatcher - WARNING - Sleep for 2.715537 seconds and try again... (tryings = 4, bot id = 7712440966)
+2025-06-11 14:54:32,089 - aiogram.dispatcher - INFO - Connection established (tryings = 5, bot id = 7712440966)
+2025-06-11 14:54:32,385 - aiogram.event - INFO - Update id=611600328 is handled. Duration 295 ms by bot id=7712440966
+2025-06-11 14:54:37,089 - aiogram.event - INFO - Update id=611600329 is handled. Duration 211 ms by bot id=7712440966
+2025-06-11 14:54:38,023 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:38,023 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:54:40,072 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-11 14:54:40,224 - aiogram.event - INFO - Update id=611600330 is handled. Duration 150 ms by bot id=7712440966
+2025-06-11 14:54:43,506 - aiogram.event - INFO - Update id=611600331 is handled. Duration 111 ms by bot id=7712440966
+2025-06-11 14:54:47,010 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:47,010 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:54:56,274 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:54:56,274 - aiogram.dispatcher - WARNING - Sleep for 1.250381 seconds and try again... (tryings = 1, bot id = 7712440966)
+2025-06-11 14:54:59,376 - aiogram.dispatcher - INFO - Connection established (tryings = 2, bot id = 7712440966)
+2025-06-11 14:54:59,687 - aiogram.event - INFO - Update id=611600332 is handled. Duration 309 ms by bot id=7712440966
+2025-06-11 14:55:05,692 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:55:05,692 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:55:07,606 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-11 14:55:07,919 - aiogram.event - INFO - Update id=611600333 is handled. Duration 311 ms by bot id=7712440966
+2025-06-11 14:55:12,233 - aiogram.event - INFO - Update id=611600334 is handled. Duration 188 ms by bot id=7712440966
+2025-06-11 14:55:14,778 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:55:14,778 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:55:17,528 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-11 14:55:17,532 - __main__ - INFO - QR-код NSP_39A06AF8 добавлен в базу данных
+2025-06-11 14:55:18,019 - __main__ - INFO - QR-код NSP_39A06AF8 создан пользователем 97915547
+2025-06-11 14:55:18,019 - aiogram.event - INFO - Update id=611600335 is handled. Duration 489 ms by bot id=7712440966
+2025-06-11 14:55:24,003 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:55:24,003 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:55:33,265 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:55:33,265 - aiogram.dispatcher - WARNING - Sleep for 1.162156 seconds and try again... (tryings = 1, bot id = 7712440966)
+2025-06-11 14:55:42,664 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:55:42,664 - aiogram.dispatcher - WARNING - Sleep for 1.495334 seconds and try again... (tryings = 2, bot id = 7712440966)
+2025-06-11 14:55:52,350 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:55:52,351 - aiogram.dispatcher - WARNING - Sleep for 1.972611 seconds and try again... (tryings = 3, bot id = 7712440966)
+2025-06-11 14:56:02,532 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:56:02,532 - aiogram.dispatcher - WARNING - Sleep for 2.484823 seconds and try again... (tryings = 4, bot id = 7712440966)
+2025-06-11 14:56:13,307 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:56:13,307 - aiogram.dispatcher - WARNING - Sleep for 3.223045 seconds and try again... (tryings = 5, bot id = 7712440966)
+2025-06-11 14:56:21,660 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:56:21,660 - aiogram.dispatcher - WARNING - Sleep for 4.261697 seconds and try again... (tryings = 6, bot id = 7712440966)
+2025-06-11 14:56:31,080 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:56:31,081 - aiogram.dispatcher - WARNING - Sleep for 4.855520 seconds and try again... (tryings = 7, bot id = 7712440966)
+2025-06-11 14:56:41,195 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:56:41,195 - aiogram.dispatcher - WARNING - Sleep for 4.928034 seconds and try again... (tryings = 8, bot id = 7712440966)
+2025-06-11 14:56:51,346 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:56:51,346 - aiogram.dispatcher - WARNING - Sleep for 4.892232 seconds and try again... (tryings = 9, bot id = 7712440966)
+2025-06-11 14:57:01,342 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:57:01,342 - aiogram.dispatcher - WARNING - Sleep for 4.956072 seconds and try again... (tryings = 10, bot id = 7712440966)
+2025-06-11 14:57:11,458 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:57:11,459 - aiogram.dispatcher - WARNING - Sleep for 4.911037 seconds and try again... (tryings = 11, bot id = 7712440966)
+2025-06-11 14:57:21,469 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:57:21,470 - aiogram.dispatcher - WARNING - Sleep for 4.793653 seconds and try again... (tryings = 12, bot id = 7712440966)
+2025-06-11 14:57:31,384 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:57:31,385 - aiogram.dispatcher - WARNING - Sleep for 5.108995 seconds and try again... (tryings = 13, bot id = 7712440966)
+2025-06-11 14:57:40,909 - aiogram.dispatcher - INFO - Connection established (tryings = 14, bot id = 7712440966)
+2025-06-11 14:57:41,273 - aiogram.event - INFO - Update id=611600336 is handled. Duration 363 ms by bot id=7712440966
+2025-06-11 14:57:41,557 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:57:41,557 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:57:50,681 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:57:50,682 - aiogram.dispatcher - WARNING - Sleep for 1.351735 seconds and try again... (tryings = 1, bot id = 7712440966)
+2025-06-11 14:57:56,203 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:57:56,204 - aiogram.dispatcher - WARNING - Sleep for 1.843002 seconds and try again... (tryings = 2, bot id = 7712440966)
+2025-06-11 14:58:02,508 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:58:02,508 - aiogram.dispatcher - WARNING - Sleep for 2.431745 seconds and try again... (tryings = 3, bot id = 7712440966)
+2025-06-11 14:58:09,121 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:58:09,121 - aiogram.dispatcher - WARNING - Sleep for 3.085143 seconds and try again... (tryings = 4, bot id = 7712440966)
+2025-06-11 14:58:13,608 - __main__ - INFO - Получен сигнал 2, завершение работы...
+2025-06-11 14:58:13,608 - aiogram.dispatcher - INFO - Polling stopped
+2025-06-11 14:58:13,608 - aiogram.dispatcher - INFO - Polling stopped for bot @NSPQRBOT id=7712440966 - 'Axiom'
+2025-06-11 14:58:13,859 - __main__ - INFO - Завершение работы бота
+2025-06-11 14:58:13,859 - __main__ - INFO - Блокировка освобождена
+2025-06-11 14:58:19,720 - __main__ - INFO - Получена блокировка: /tmp/nsp_bot.lock
+2025-06-11 14:58:19,769 - __main__ - INFO - База данных инициализирована успешно
+2025-06-11 14:58:19,769 - __main__ - INFO - Бот инициализирован успешно
+2025-06-11 14:58:19,769 - __main__ - INFO - Запуск NSP QR Generator Bot...
+2025-06-11 14:58:20,047 - aiogram.dispatcher - INFO - Start polling
+2025-06-11 14:58:20,138 - aiogram.dispatcher - INFO - Run polling for bot @NSPQRBOT id=7712440966 - 'Axiom'
+2025-06-11 14:58:25,101 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:58:25,102 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-11 14:58:31,354 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:58:31,354 - aiogram.dispatcher - WARNING - Sleep for 1.247317 seconds and try again... (tryings = 1, bot id = 7712440966)
+2025-06-11 14:58:36,779 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-11 14:58:36,779 - aiogram.dispatcher - WARNING - Sleep for 1.515282 seconds and try again... (tryings = 2, bot id = 7712440966)
+2025-06-11 14:58:37,128 - __main__ - INFO - Получен сигнал 2, завершение работы...
+2025-06-11 14:58:37,128 - aiogram.dispatcher - INFO - Polling stopped
+2025-06-11 14:58:37,128 - aiogram.dispatcher - INFO - Polling stopped for bot @NSPQRBOT id=7712440966 - 'Axiom'
+2025-06-11 14:58:37,379 - __main__ - INFO - Завершение работы бота
+2025-06-11 14:58:37,380 - __main__ - INFO - Блокировка освобождена
+2025-06-11 14:59:36,079 - __main__ - INFO - Получена блокировка: /tmp/nsp_bot.lock
+2025-06-11 14:59:36,128 - __main__ - INFO - База данных инициализирована успешно
+2025-06-11 14:59:36,128 - __main__ - INFO - Бот инициализирован успешно
+2025-06-11 14:59:36,128 - __main__ - INFO - Запуск NSP QR Generator Bot...
+2025-06-11 14:59:36,260 - __main__ - ERROR - Другой экземпляр бота уже запущен!
+2025-06-11 14:59:36,407 - aiogram.dispatcher - INFO - Start polling
+2025-06-11 14:59:36,500 - aiogram.dispatcher - INFO - Run polling for bot @NSPQRBOT id=7712440966 - 'Axiom'
+2025-06-11 14:59:42,857 - aiogram.event - INFO - Update id=611600340 is handled. Duration 304 ms by bot id=7712440966
+2025-06-11 14:59:50,698 - aiogram.event - INFO - Update id=611600341 is handled. Duration 191 ms by bot id=7712440966
+2025-06-11 14:59:55,126 - aiogram.event - INFO - Update id=611600342 is handled. Duration 229 ms by bot id=7712440966
+2025-06-11 14:59:58,356 - aiogram.event - INFO - Update id=611600343 is handled. Duration 117 ms by bot id=7712440966
+2025-06-11 15:00:13,643 - __main__ - INFO - QR-код NSP_349B9CE3 добавлен в базу данных
+2025-06-11 15:00:14,093 - __main__ - INFO - QR-код NSP_349B9CE3 создан пользователем 97915547
+2025-06-11 15:00:14,093 - aiogram.event - INFO - Update id=611600344 is handled. Duration 453 ms by bot id=7712440966
+2025-06-11 16:11:17,480 - aiogram.event - INFO - Update id=611600345 is handled. Duration 318 ms by bot id=7712440966
+2025-06-11 16:11:33,777 - aiogram.event - INFO - Update id=611600346 is handled. Duration 267 ms by bot id=7712440966
+2025-06-11 16:11:36,663 - aiogram.event - INFO - Update id=611600347 is handled. Duration 305 ms by bot id=7712440966
+2025-06-11 16:11:42,930 - aiogram.event - INFO - Update id=611600348 is handled. Duration 187 ms by bot id=7712440966
+2025-06-11 16:12:00,728 - __main__ - INFO - QR-код NSP_E12F8436 добавлен в базу данных
+2025-06-11 16:12:01,338 - __main__ - INFO - QR-код NSP_E12F8436 создан пользователем 97915547
+2025-06-11 16:12:01,338 - aiogram.event - INFO - Update id=611600349 is handled. Duration 612 ms by bot id=7712440966
+2025-06-13 06:30:39,472 - aiogram.event - INFO - Update id=611600350 is handled. Duration 285 ms by bot id=7712440966
+2025-06-14 09:51:55,433 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2025-06-14 09:51:55,433 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-14 09:51:59,555 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-14 09:51:59,555 - aiogram.dispatcher - WARNING - Sleep for 1.424862 seconds and try again... (tryings = 1, bot id = 7712440966)
+2025-06-14 09:52:11,068 - aiogram.dispatcher - INFO - Connection established (tryings = 2, bot id = 7712440966)
+2025-06-17 05:01:09,717 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 104] Connection reset by peer
+2025-06-17 05:01:09,717 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-17 05:01:20,971 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-17 07:29:00,201 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 104] Connection reset by peer
+2025-06-17 07:29:00,201 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-17 07:29:11,461 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-17 08:31:33,402 - aiogram.event - INFO - Update id=611600351 is handled. Duration 313 ms by bot id=7712440966
+2025-06-18 07:25:55,496 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2025-06-18 07:25:55,497 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-18 07:26:00,258 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-06-18 07:26:00,259 - aiogram.dispatcher - WARNING - Sleep for 1.351737 seconds and try again... (tryings = 1, bot id = 7712440966)
+2025-06-18 07:26:11,703 - aiogram.dispatcher - INFO - Connection established (tryings = 2, bot id = 7712440966)
+2025-06-18 07:26:11,784 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 104] Connection reset by peer
+2025-06-18 07:26:11,784 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-18 07:26:24,604 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-19 07:24:16,922 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientOSError: [Errno 104] Connection reset by peer
+2025-06-19 07:24:16,922 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-19 07:24:28,177 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-21 21:22:18,201 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2025-06-21 21:22:18,201 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-21 21:22:29,461 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-22 12:17:00,199 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2025-06-22 12:17:00,200 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-22 12:17:11,479 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-23 09:44:14,497 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2025-06-23 09:44:14,497 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-23 09:44:25,768 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
+2025-06-23 22:55:22,485 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+2025-06-23 22:55:22,485 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7712440966)
+2025-06-23 22:55:33,741 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 7712440966)
