@@ -1,29 +1,22 @@
 #!/bin/bash
 
-# Скрипт запуска Telegram бота с PostgreSQL
-
 echo "Запуск NSP QR Bot (PostgreSQL версия)..."
 
-# Проверка виртуального окружения
 if [ ! -d "venv" ]; then
     echo "Создание виртуального окружения..."
     python3 -m venv venv
 fi
 
-# Активация виртуального окружения
 source venv/bin/activate
 
-# Установка зависимостей
 echo "Установка зависимостей..."
 pip install -r requirements.txt
 
-# Проверка конфигурации
 if [ ! -f "config.py" ]; then
     echo "Ошибка: файл config.py не найден!"
     exit 1
 fi
 
-# Проверка подключения к PostgreSQL
 echo "Проверка подключения к базе данных..."
 python3 -c "
 import asyncio

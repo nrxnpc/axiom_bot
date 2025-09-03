@@ -36,7 +36,7 @@ class AppUser(Base):
     password_hash = Column(String, nullable=False)
     user_type = Column(String, default="individual")
     points = Column(Integer, default=0)
-    role = Column(String, default="user")  # user, admin, operator
+    role = Column(String, default="user")  # user, admin, operator, company
     registration_date = Column(TIMESTAMP, server_default=func.now())
     is_active = Column(Boolean, default=True)
     last_login = Column(TIMESTAMP)
@@ -82,6 +82,7 @@ class Product(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
     delivery_options = Column(JSONB)
     created_by = Column(UUID(as_uuid=True), ForeignKey("app_users.id"))
+    company_id = Column(UUID(as_uuid=True), ForeignKey("app_users.id"))  # Для товаров компаний
 
     orders = relationship("Order", back_populates="product")
 
@@ -97,7 +98,9 @@ class NewsArticle(Base):
     published_at = Column(TIMESTAMP)
     is_published = Column(Boolean, default=False)
     author_id = Column(UUID(as_uuid=True), ForeignKey("app_users.id"))
+    company_id = Column(UUID(as_uuid=True), ForeignKey("app_users.id"))  # Для новостей компаний
     tags = Column(JSONB)
+    article_type = Column(String, default="news")  # news, promotion, campaign
 
 class Lottery(Base):
     __tablename__ = "lotteries"
@@ -199,6 +202,26 @@ class SupportMessage(Base):
     attachments = Column(JSONB)
 
     ticket = relationship("SupportTicket", back_populates="messages")
+
+class PromoCampaign(Base):
+    __tablename__ = "promo_campaigns"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
+    campaign_type = Column(String, nullable=False)  # discount, bonus_points, free_shipping
+    discount_percent = Column(Integer, default=0)
+    bonus_points = Column(Integer, default=0)
+    min_purchase_amount = Column(Integer, default=0)
+    start_date = Column(TIMESTAMP, nullable=False)
+    end_date = Column(TIMESTAMP, nullable=False)
+    is_active = Column(Boolean, default=True)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("app_users.id"), nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    image_url = Column(String)
+    target_audience = Column(JSONB)  # критерии целевой аудитории
+    usage_count = Column(Integer, default=0)
+    max_usage = Column(Integer, default=0)  # 0 = без ограничений
 
 class UserSession(Base):
     __tablename__ = "user_sessions"

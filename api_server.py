@@ -27,7 +27,7 @@ from sqlalchemy.orm import selectinload
 from config import DATABASE_URL, API_KEYS, API_HOST, API_PORT
 from models import (
     Base, AppUser, QRCode, Product, NewsArticle, Car, Lottery, Order, 
-    PointTransaction, AppQRScan, SupportTicket, SupportMessage, UserSession
+    PointTransaction, AppQRScan, SupportTicket, SupportMessage, UserSession, PromoCampaign
 )
 
 # Конфигурация
@@ -54,9 +54,13 @@ AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_co
 
 async def init_database():
     """Инициализация базы данных"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        logger.info("База данных инициализирована")
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+            logger.info("База данных инициализирована")
+    except Exception as e:
+        logger.warning(f"Не удалось создать таблицы: {e}")
+        logger.info("Продолжаем работу с существующими таблицами")
 
 def check_api_key(func):
     """Декоратор для проверки API ключа"""
@@ -700,6 +704,265 @@ async def get_user_transactions(request: web_request.Request) -> Response:
             "error": "Failed to get user transactions"
         }, status=500)
 
+# Функционал для компаний
+
+@check_api_key
+@require_auth
+async def add_product(request: web_request.Request) -> Response:
+    """Добавление товара (admin, operator, company)"""
+    try:
+        user = request['user']
+        if user.role not in ['admin', 'operator', 'company']:
+            return json_response({
+                "error": "Insufficient permissions"
+            }, status=403)
+        
+        data = await request.json()
+        required_fields = ['name', 'category', 'pointsCost']
+        if not all(field in data for field in required_fields):
+            return json_response({
+                "error": "Missing required fields"
+            }, status=400)
+        
+        async with AsyncSessionLocal() as db:
+            new_product = Product(
+                name=data['name'],
+                category=data['category'],
+                points_cost=data['pointsCost'],
+                description=data.get('description', ''),
+                image_url=data.get('imageURL', ''),
+                stock_quantity=data.get('stockQuantity', 0),
+                delivery_options=data.get('deliveryOptions', []),
+                created_by=user.id,
+                company_id=user.id if user.role == 'company' else None
+            )
+            db.add(new_product)
+            await db.commit()
+            
+            return json_response({
+                "success": True,
+                "product_id": str(new_product.id),
+                "message": "Product added successfully"
+            })
+        
+    except Exception as e:
+        logger.error(f"Add product error: {e}")
+        return json_response({
+            "error": "Failed to add product"
+        }, status=500)
+
+@check_api_key
+@require_auth
+async def add_news(request: web_request.Request) -> Response:
+    """Добавление новости/акции (admin, operator, company)"""
+    try:
+        user = request['user']
+        if user.role not in ['admin', 'operator', 'company']:
+            return json_response({
+                "error": "Insufficient permissions"
+            }, status=403)
+        
+        data = await request.json()
+        required_fields = ['title', 'content']
+        if not all(field in data for field in required_fields):
+            return json_response({
+                "error": "Missing required fields"
+            }, status=400)
+        
+        async with AsyncSessionLocal() as db:
+            new_article = NewsArticle(
+                title=data['title'],
+                content=data['content'],
+                image_url=data.get('imageURL', ''),
+                is_important=data.get('isImportant', False),
+                is_published=data.get('isPublished', True),
+                published_at=func.now() if data.get('isPublished', True) else None,
+                author_id=user.id,
+                company_id=user.id if user.role == 'company' else None,
+                tags=data.get('tags', []),
+                article_type=data.get('articleType', 'news')
+            )
+            db.add(new_article)
+            await db.commit()
+            
+            return json_response({
+                "success": True,
+                "article_id": str(new_article.id),
+                "message": "Article added successfully"
+            })
+        
+    except Exception as e:
+        logger.error(f"Add news error: {e}")
+        return json_response({
+            "error": "Failed to add news"
+        }, status=500)
+
+@check_api_key
+@require_auth
+async def create_promo_campaign(request: web_request.Request) -> Response:
+    """Создание промо-кампании (admin, operator, company)"""
+    try:
+        user = request['user']
+        if user.role not in ['admin', 'operator', 'company']:
+            return json_response({
+                "error": "Insufficient permissions"
+            }, status=403)
+        
+        data = await request.json()
+        required_fields = ['title', 'description', 'campaignType', 'startDate', 'endDate']
+        if not all(field in data for field in required_fields):
+            return json_response({
+                "error": "Missing required fields"
+            }, status=400)
+        
+        async with AsyncSessionLocal() as db:
+            new_campaign = PromoCampaign(
+                title=data['title'],
+                description=data['description'],
+                campaign_type=data['campaignType'],
+                discount_percent=data.get('discountPercent', 0),
+                bonus_points=data.get('bonusPoints', 0),
+                min_purchase_amount=data.get('minPurchaseAmount', 0),
+                start_date=datetime.fromisoformat(data['startDate']),
+                end_date=datetime.fromisoformat(data['endDate']),
+                company_id=user.id,
+                image_url=data.get('imageURL', ''),
+                target_audience=data.get('targetAudience', {}),
+                max_usage=data.get('maxUsage', 0)
+            )
+            db.add(new_campaign)
+            await db.commit()
+            
+            return json_response({
+                "success": True,
+                "campaign_id": str(new_campaign.id),
+                "message": "Promo campaign created successfully"
+            })
+        
+    except Exception as e:
+        logger.error(f"Create promo campaign error: {e}")
+        return json_response({
+            "error": "Failed to create promo campaign"
+        }, status=500)
+
+@check_api_key
+@require_auth
+async def get_company_analytics(request: web_request.Request) -> Response:
+    """Аналитика для компании"""
+    try:
+        user = request['user']
+        if user.role != 'company':
+            return json_response({
+                "error": "Only companies can access this endpoint"
+            }, status=403)
+        
+        async with AsyncSessionLocal() as db:
+            # Статистика товаров компании
+            company_products = await db.execute(
+                select(func.count(Product.id)).where(Product.company_id == user.id)
+            )
+            total_products = company_products.scalar() or 0
+            
+            # Статистика новостей/акций
+            company_news = await db.execute(
+                select(func.count(NewsArticle.id)).where(NewsArticle.company_id == user.id)
+            )
+            total_news = company_news.scalar() or 0
+            
+            # Статистика промо-кампаний
+            company_campaigns = await db.execute(
+                select(func.count(PromoCampaign.id)).where(PromoCampaign.company_id == user.id)
+            )
+            total_campaigns = company_campaigns.scalar() or 0
+            
+            # Активные кампании
+            active_campaigns = await db.execute(
+                select(func.count(PromoCampaign.id)).where(
+                    PromoCampaign.company_id == user.id,
+                    PromoCampaign.is_active == True,
+                    PromoCampaign.start_date <= func.now(),
+                    PromoCampaign.end_date >= func.now()
+                )
+            )
+            active_campaigns = active_campaigns.scalar() or 0
+            
+            return json_response({
+                "company_id": user.user_id,
+                "company_name": user.name,
+                "analytics": {
+                    "products": {
+                        "total": total_products
+                    },
+                    "news": {
+                        "total": total_news
+                    },
+                    "campaigns": {
+                        "total": total_campaigns,
+                        "active": active_campaigns
+                    }
+                },
+                "timestamp": datetime.now().isoformat()
+            })
+        
+    except Exception as e:
+        logger.error(f"Get company analytics error: {e}")
+        return json_response({
+            "error": "Failed to get company analytics"
+        }, status=500)
+
+@check_api_key
+async def get_promo_campaigns(request: web_request.Request) -> Response:
+    """Получение активных промо-кампаний"""
+    try:
+        limit = int(request.query.get('limit', 50))
+        offset = int(request.query.get('offset', 0))
+        
+        async with AsyncSessionLocal() as db:
+            campaigns = await db.execute(
+                select(PromoCampaign)
+                .where(
+                    PromoCampaign.is_active == True,
+                    PromoCampaign.start_date <= func.now(),
+                    PromoCampaign.end_date >= func.now()
+                )
+                .order_by(PromoCampaign.created_at.desc())
+                .limit(limit)
+                .offset(offset)
+            )
+            campaigns = campaigns.scalars().all()
+            
+            campaigns_list = []
+            for campaign in campaigns:
+                campaigns_list.append({
+                    "id": str(campaign.id),
+                    "title": campaign.title,
+                    "description": campaign.description,
+                    "campaignType": campaign.campaign_type,
+                    "discountPercent": campaign.discount_percent,
+                    "bonusPoints": campaign.bonus_points,
+                    "minPurchaseAmount": campaign.min_purchase_amount,
+                    "startDate": campaign.start_date.isoformat(),
+                    "endDate": campaign.end_date.isoformat(),
+                    "imageURL": campaign.image_url or "",
+                    "usageCount": campaign.usage_count,
+                    "maxUsage": campaign.max_usage,
+                    "companyId": str(campaign.company_id)
+                })
+            
+            return json_response({
+                "campaigns": campaigns_list,
+                "pagination": {
+                    "limit": limit,
+                    "offset": offset
+                }
+            })
+        
+    except Exception as e:
+        logger.error(f"Get promo campaigns error: {e}")
+        return json_response({
+            "error": "Failed to get promo campaigns"
+        }, status=500)
+
 # Загрузка файлов
 
 @check_api_key
@@ -708,7 +971,7 @@ async def upload_file(request: web_request.Request) -> Response:
     """Загрузка файла"""
     try:
         user = request['user']
-        if user.role not in ['admin', 'operator']:
+        if user.role not in ['admin', 'operator', 'company']:
             return json_response({
                 "error": "Insufficient permissions"
             }, status=403)
@@ -871,9 +1134,18 @@ def init_app():
     
     # Товары
     app.router.add_get('/api/v1/products', get_products)
+    app.router.add_post('/api/v1/products', add_product)
     
     # Новости
     app.router.add_get('/api/v1/news', get_news)
+    app.router.add_post('/api/v1/news', add_news)
+    
+    # Промо-кампании
+    app.router.add_get('/api/v1/campaigns', get_promo_campaigns)
+    app.router.add_post('/api/v1/campaigns', create_promo_campaign)
+    
+    # Аналитика компаний
+    app.router.add_get('/api/v1/company/analytics', get_company_analytics)
     
     # Транзакции
     app.router.add_get('/api/v1/user/transactions', get_user_transactions)

@@ -1,29 +1,22 @@
 #!/bin/bash
 
-# Скрипт запуска API сервера с PostgreSQL
-
 echo "Запуск NSP API Server (PostgreSQL версия)..."
 
-# Проверка виртуального окружения
 if [ ! -d "venv" ]; then
     echo "Создание виртуального окружения..."
     python3 -m venv venv
 fi
 
-# Активация виртуального окружения
 source venv/bin/activate
 
-# Установка зависимостей
 echo "Установка зависимостей..."
 pip install -r requirements_api.txt
 
-# Проверка конфигурации
 if [ ! -f "config.py" ]; then
     echo "Ошибка: файл config.py не найден!"
     exit 1
 fi
 
-# Проверка подключения к PostgreSQL
 echo "Проверка подключения к базе данных..."
 python3 -c "
 import asyncio
@@ -51,6 +44,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Запуск API сервера
 echo "Запуск API сервера на порту 8080..."
 python3 api_server.py
